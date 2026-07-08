@@ -1,6 +1,6 @@
 # Edamame のドキュメント
 
-Edamame MVP は、ライブ HLS のセグメントを受け取る `edamame-core` と、
+Edamame Alpha は、ライブ HLS のセグメントを受け取る `edamame-core` と、
 セグメントを事前に取得して配信する `edamame-node` で動きます。
 
 外部のソフトウェアから使う場合は、まず次のドキュメントを見てください。
@@ -8,7 +8,7 @@ Edamame MVP は、ライブ HLS のセグメントを受け取る `edamame-core`
 - [API リファレンス](./api.md): HTTP エンドポイント、JSON、ステータスコード
 - [ローカルで動かす](./running.md): 起動例と `curl` での確認手順
 
-## MVP の前提
+## Alpha の前提
 
 - `edamame-core` は origin と controller の役割をまとめたプロセスです。
 - origin は、登録されたセグメントの正規コピーを持ちます。
