@@ -23,6 +23,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: combined
     image: edamame:latest
     command:
       - edamame-core
