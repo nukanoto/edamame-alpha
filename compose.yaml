@@ -1,0 +1,92 @@
+# Experiment stack: one combined origin/controller (edamame-core) + two cache
+# nodes (edamame-node).
+#
+# Why static IPs on the nodes:
+#   A node advertises its base_url to the core as `http://<--bind addr>`
+#   (see src/bin/edamame-node.rs). The core writes that URL straight into the
+#   generated media playlists. `--bind` must be an IP (SocketAddr), not a
+#   hostname, so we pin each node to a fixed address on a user-defined network.
+#   That makes the playlist URLs (e.g. http://172.28.0.11:9001/segments/...)
+#   resolvable for any client *inside* this compose network.
+#
+# Host-reachability caveat:
+#   The published ports let you hit each service from the host
+#   (localhost:9000 / :9001 / :9002). But playlists returned by the core point
+#   at the 172.28.0.x node IPs, which the host cannot route to directly
+#   (especially on Docker Desktop / macOS). To follow a playlist end-to-end,
+#   run the client from inside the network, e.g.:
+#     docker compose exec core sh -c 'apt-get update && apt-get install -y curl'  # if needed
+#   or simply curl the node's published port directly: localhost:9001/segments/...
+
+services:
+  core:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: edamame:latest
+    command:
+      - edamame-core
+      - --bind=0.0.0.0:9000
+      - --storage-dir=/data
+      - --live-window=6
+      - --retention-window=12
+      - --heartbeat-timeout-ms=15000
+      - --overload-threshold=0.9
+    ports:
+      - "9000:9000"
+    volumes:
+      - core-storage:/data
+    networks:
+      edamame:
+        ipv4_address: 172.28.0.10
+
+  node-1:
+    image: edamame:latest
+    # Reuse the image built by the `core` service.
+    depends_on:
+      - core
+    command:
+      - edamame-node
+      - --node-id=node-1
+      - --bind=172.28.0.11:9001
+      - --core-url=http://core:9000
+      - --cache-dir=/cache
+      - --heartbeat-interval-ms=3000
+    ports:
+      - "9001:9001"
+    volumes:
+      - node1-cache:/cache
+    networks:
+      edamame:
+        ipv4_address: 172.28.0.11
+
+  node-2:
+    image: edamame:latest
+    depends_on:
+      - core
+    command:
+      - edamame-node
+      - --node-id=node-2
+      - --bind=172.28.0.12:9002
+      - --core-url=http://core:9000
+      - --cache-dir=/cache
+      - --heartbeat-interval-ms=3000
+    ports:
+      - "9002:9002"
+    volumes:
+      - node2-cache:/cache
+    networks:
+      edamame:
+        ipv4_address: 172.28.0.12
+
+networks:
+  edamame:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+volumes:
+  core-storage:
+  node1-cache:
+  node2-cache:

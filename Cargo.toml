@@ -3,4 +3,61 @@ name = "edamame-alpha"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+name = "edamame_alpha"
+path = "src/lib.rs"
+
+[[bin]]
+name = "edamame-core"
+path = "src/bin/edamame-core.rs"
+
+[[bin]]
+name = "edamame-node"
+path = "src/bin/edamame-node.rs"
+
 [dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "time", "signal"] }
+axum = "0.8"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+reqwest = { version = "0.12", default-features = false, features = ["json"] }
+clap = { version = "4", features = ["derive"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "time"] }
+
+[[test]]
+name = "unit_rendition_metadata"
+path = "tests/unit/rendition_metadata.rs"
+
+[[test]]
+name = "unit_state_transitions"
+path = "tests/unit/state_transitions.rs"
+
+[[test]]
+name = "unit_placement"
+path = "tests/unit/placement.rs"
+
+[[test]]
+name = "unit_manifest_rewrite"
+path = "tests/unit/manifest_rewrite.rs"
+
+[[test]]
+name = "contract_http_core_node"
+path = "tests/contract/http_core_node.rs"
+
+[[test]]
+name = "contract_cli"
+path = "tests/contract/cli.rs"
+
+[[test]]
+name = "integration_ingest_generated_playlists"
+path = "tests/integration/ingest_generated_playlists.rs"
+
+[[test]]
+name = "integration_node_lifecycle"
+path = "tests/integration/node_lifecycle.rs"
+
+[[test]]
+name = "integration_prewarm_retention"
+path = "tests/integration/prewarm_retention.rs"

@@ -1,0 +1,7 @@
+target/
+.git/
+*.md
+.specify/
+compose.yaml
+Dockerfile
+.dockerignore
